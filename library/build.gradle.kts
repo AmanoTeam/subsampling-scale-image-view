@@ -11,20 +11,6 @@ android {
         minSdk = 24
 
         consumerProguardFiles("proguard-rules.txt")
-
-        externalNativeBuild {
-            cmake {
-                cppFlags("-O3 -flto")
-                targets("ep_ssiv_crop")
-            }
-        }
-    }
-
-    externalNativeBuild {
-        cmake {
-            path = file("src/main/cpp/CMakeLists.txt")
-            version = "3.22.1"
-        }
     }
 
     compileOptions {
