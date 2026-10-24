@@ -16,6 +16,7 @@ private const val BORDER_PIXELS = 4_000_000.0
 class Decoder(
     private val cropBorders: Boolean,
     private val cropRect: IntArray? = null,
+    private val cropPad: Int = 0,
 ) : ImageRegionDecoder {
 
     // Kept open so each tile decodes only its own region; ImageDecoder serialises the calls.
@@ -51,10 +52,13 @@ class Decoder(
             cropRect[0] >= 0 && cropRect[1] >= 0 && cropRect[2] > 0 && cropRect[3] > 0 &&
             cropRect[0] + cropRect[2] <= dec.width && cropRect[1] + cropRect[3] <= dec.height
         ) {
+            // The gutters flare trimmed come back into view, up to [cropPad] rows of the real ones
+            val top = (cropRect[1] - cropPad).coerceAtLeast(0)
+            val bottom = (cropRect[1] + cropRect[3] + cropPad).coerceAtMost(dec.height)
             cropLeft = cropRect[0]
-            cropTop = cropRect[1]
+            cropTop = top
             cropWidth = cropRect[2]
-            cropHeight = cropRect[3]
+            cropHeight = bottom - top
         }
         // Border detection reads 8-bit RGBA, so HDR (half-float) images are left uncropped
         else if (cropBorders && !dec.isHdr) {

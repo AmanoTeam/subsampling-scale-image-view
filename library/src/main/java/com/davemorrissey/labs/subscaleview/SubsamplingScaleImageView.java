@@ -173,6 +173,8 @@ public class SubsamplingScaleImageView extends View {
     private boolean cropBorders = false;
 
     private int[] cropRect;
+
+    private int cropPad = 0;
     // Whether to decode to hardware bitmap
     private boolean hardwareConfig = true;
     private int maxTileWidth = TILE_SIZE_AUTO;
@@ -1556,6 +1558,15 @@ public class SubsamplingScaleImageView extends View {
     }
 
     /**
+     * Set how many pixels of the border gutters the cropped view keeps, when a crop rect is set.
+     *
+     * @param cropPad The padding in image pixels.
+     */
+    public void setCropPad(int cropPad) {
+        this.cropPad = cropPad;
+    }
+
+    /**
      * Set if we want to use hardware bitmap config for decoded bitmap regions.
      *
      * @param hardwareConfig Whether to use hardware bitmap config.
@@ -2782,7 +2793,7 @@ public class SubsamplingScaleImageView extends View {
                 InputProvider provider = providerRef.get();
                 if (context != null && view != null && provider == view.provider) {
                     view.debug("TilesInitTask.doInBackground");
-                    decoder = new Decoder(view.cropBorders, view.cropRect);
+                    decoder = new Decoder(view.cropBorders, view.cropRect, view.cropPad);
                     Point dimensions = decoder.init(context, provider);
                     int sWidth = dimensions.x;
                     int sHeight = dimensions.y;
