@@ -15,6 +15,7 @@ private const val BORDER_PIXELS = 4_000_000.0
 
 class Decoder(
     private val cropBorders: Boolean,
+    private val cropRect: IntArray? = null,
 ) : ImageRegionDecoder {
 
     // Kept open so each tile decodes only its own region; ImageDecoder serialises the calls.
@@ -45,8 +46,18 @@ class Decoder(
         cropWidth = dec.width
         cropHeight = dec.height
 
+        // A precomputed rect comes in image pixels and wins over everything else
+        if (cropRect != null && cropRect.size >= 4 &&
+            cropRect[0] >= 0 && cropRect[1] >= 0 && cropRect[2] > 0 && cropRect[3] > 0 &&
+            cropRect[0] + cropRect[2] <= dec.width && cropRect[1] + cropRect[3] <= dec.height
+        ) {
+            cropLeft = cropRect[0]
+            cropTop = cropRect[1]
+            cropWidth = cropRect[2]
+            cropHeight = cropRect[3]
+        }
         // Border detection reads 8-bit RGBA, so HDR (half-float) images are left uncropped
-        if (cropBorders && !dec.isHdr) {
+        else if (cropBorders && !dec.isHdr) {
             try {
                 // The full page could be hundreds of MB on the Java heap.
                 val pixels = dec.width.toDouble() * dec.height
