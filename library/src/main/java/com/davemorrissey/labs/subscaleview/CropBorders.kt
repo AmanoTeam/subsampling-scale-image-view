@@ -10,7 +10,7 @@ package com.davemorrissey.labs.subscaleview
 class CropBorders private constructor() {
     companion object {
         init {
-            System.loadLibrary("ssiv_crop")
+            System.loadLibrary("flare")
         }
 
         /**
